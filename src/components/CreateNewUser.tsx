@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
+import { toast } from "sonner";
 
 export function CreateNewUser() {
   const { handleAddNewUser } = useUsers();
@@ -23,6 +24,7 @@ export function CreateNewUser() {
 
     handleAddNewUser({ name, gmail, github });
     setResult("ok");
+    toast("usuario creado :)");
 
     form.reset();
   };
