@@ -20,6 +20,34 @@ const syncWithDatabaseMiddleware: Middleware =
     console.log({ type, payload });
     console.log({ action, state: store.getState() });
 
+    //crear un usuario
+    fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      body: JSON.stringify({
+        title: "foo",
+        body: "bar",
+        userId: 1,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+
+    //actualizar usuario creado
+    fetch("https://jsonplaceholder.typicode.com/posts/1", {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "foo",
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+
     if (type === "user/deleteUserbyId") {
       const userToRemove = previusState.user.find(
         (user: User) => user.id === payload,
