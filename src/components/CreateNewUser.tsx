@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { useUsers } from "../hooks/useUsers";
 import { toast } from "sonner";
+import { useUserDispatchContext } from "../hooks/useUserDispatchContext";
+import { useEditingUser } from "../hooks/useEditingUser";
 
 export function CreateNewUser() {
-  const { handleAddNewUser } = useUsers();
+  const dispatch = useUserDispatchContext();
+  const { userToEdit, setEditingUser } = useEditingUser();
   const [result, setResult] = useState<"ok" | "error" | null>(null);
 
+  const isEditing = Boolean(userToEdit);
+
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const id = crypto.randomUUID();
     e.preventDefault();
 
     setResult(null);
@@ -22,7 +27,28 @@ export function CreateNewUser() {
       return setResult("error");
     }
 
-    handleAddNewUser({ name, gmail, github });
+    if (isEditing && userToEdit) {
+      dispatch({
+        type: "UPDATE_USER",
+        user: {
+          userID: userToEdit.userID,
+          name,
+          gmail,
+          github,
+        },
+      });
+    } else {
+      dispatch({
+        type: "ADD_USER",
+        user: {
+          userID: id,
+          name: name,
+          gmail: gmail,
+          github: github,
+        },
+      });
+    }
+
     setResult("ok");
     toast("usuario creado :)");
 
@@ -30,6 +56,7 @@ export function CreateNewUser() {
   };
   return (
     <form
+      key={userToEdit?.userID ?? "new"}
       onSubmit={handleSubmit}
       style={{
         marginTop: "16px",
@@ -42,23 +69,43 @@ export function CreateNewUser() {
       }}>
       <label>
         Nombre
-        <input name="name" type="text" />
+        <input name="name" type="text" defaultValue={userToEdit?.name || ""} />
       </label>
       <label>
         Gmail
-        <input name="gmail" type="text" />
+        <input
+          name="gmail"
+          type="text"
+          defaultValue={userToEdit?.gmail || ""}
+        />
       </label>
       <label>
         Usuario de github
-        <input name="github" type="text" />
+        <input
+          name="github"
+          type="text"
+          defaultValue={userToEdit?.github || ""}
+        />
       </label>
-      <button type="submit">crear usuario</button>
+      <button type="submit">
+        {isEditing ? "Guardar Cambios" : "Crear usuario"}
+      </button>
+
+      {isEditing && (
+        <button type="button" onClick={() => setEditingUser(null)}>
+          Cancelar Edición
+        </button>
+      )}
       <span>
         {result === "ok" && (
-          <p style={{ color: "green" }}>usuario creado correctamente</p>
+          <p style={{ color: "green" }}>
+            {isEditing
+              ? "Usuario editado correctamente"
+              : "Usuario creado correctamente"}
+          </p>
         )}
         {result === "error" && (
-          <p style={{ color: "red" }}>error al crear usuario</p>
+          <p style={{ color: "red" }}>Error al procesar usuario</p>
         )}
       </span>
     </form>

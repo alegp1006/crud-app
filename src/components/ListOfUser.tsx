@@ -1,9 +1,11 @@
-import { useAppSelector } from "../hooks/store";
-import { useUsers } from "../hooks/useUsers";
+import { useEditingUser } from "../hooks/useEditingUser";
+import { useUserContext } from "../hooks/useUserContext";
+import { useUserDispatchContext } from "../hooks/useUserDispatchContext";
 
 export function ListOfUser() {
-  const users = useAppSelector((state) => state.user);
-  const { handleDeleteUser } = useUsers();
+  const users = useUserContext();
+  const dispatch = useUserDispatchContext();
+  const { setEditingUser } = useEditingUser();
   return (
     <table>
       <caption>Usuarios-{users.length}</caption>
@@ -17,8 +19,8 @@ export function ListOfUser() {
       </thead>
       <tbody>
         {users.map((u) => (
-          <tr key={u.id}>
-            <td>{u.id}</td>
+          <tr key={u.userID}>
+            <td>{u.userID}</td>
             <td
               style={{
                 display: "flex",
@@ -42,7 +44,12 @@ export function ListOfUser() {
                 justifyContent: "center",
               }}>
               <button
-                onClick={() => handleDeleteUser(u.id)}
+                onClick={() => {
+                  dispatch({
+                    type: "DELETE_USER",
+                    userID: u.userID,
+                  });
+                }}
                 style={{
                   width: "100%",
                 }}>
@@ -65,6 +72,9 @@ export function ListOfUser() {
               <button
                 style={{
                   width: "100%",
+                }}
+                onClick={() => {
+                  setEditingUser(u);
                 }}>
                 <svg
                   aria-label="edit element"
