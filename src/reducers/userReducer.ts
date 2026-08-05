@@ -1,10 +1,11 @@
 import type { UserAction } from "../context/users";
 import type { User } from "../models/users";
 
-export const initialState = [];
-
 export function userReducer(state: User[], action: UserAction) {
   switch (action.type) {
+    case "SET_USERS":
+      return action.payload;
+
     case "ADD_USER": {
       return [
         ...state,

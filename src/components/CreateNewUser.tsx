@@ -111,24 +111,3 @@ export function CreateNewUser() {
     </form>
   );
 }
-
-// function Task({ task, onChange, onDelete }) {
-//   const [isEditing, setIsEditing] = useState(false);
-//   let taskContent;
-//   if (isEditing) {
-//     taskContent = (
-//       <>
-//         <input
-//           value={task.text}
-//           onChange={e => {
-//             onChange({
-//               ...task,
-//               text: e.target.value
-//             });
-//           }} />
-//         <button onClick={() => setIsEditing(false)}>
-//           Guardar
-//         </button>
-//       </>
-//     );
-//   }}
