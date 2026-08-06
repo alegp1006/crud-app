@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "../models/users";
 import { getUsers } from "../services/getUsers";
+import { toast } from "sonner";
 
 export const useUser = () => {
   const [initialStateUser, setInitialStateUser] = useState<User[]>([]);
@@ -17,6 +18,7 @@ export const useUser = () => {
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError("somenthing is wrong" + err.message);
+          toast.error("error al cargar los usuarios");
         }
       } finally {
         setLoading(false);

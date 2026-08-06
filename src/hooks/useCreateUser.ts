@@ -10,7 +10,7 @@ export interface MockCreateUser {
 
 export const useCreateUser = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>("");
 
   async function createUsers(user: MockCreateUser) {
     try {

@@ -33,7 +33,7 @@ export function CreateNewUser() {
         body: gmail,
         userId: 1,
       });
-      if (!error || error === null) {
+      if (!error && error === null) {
         dispatch({
           type: "UPDATE_USER",
           user: {
@@ -50,7 +50,8 @@ export function CreateNewUser() {
         title: name,
         body: gmail,
       });
-      if (!createUserError || createUserError === null) {
+      if (createUserError === null && createUserError !== "") {
+        console.log(createUserError);
         dispatch({
           type: "ADD_USER",
           user: {
