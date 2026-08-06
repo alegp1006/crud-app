@@ -1,7 +1,7 @@
 import { URL_API } from "../constants/url";
-import type { User } from "../models/users";
+import type { MockCreateUser } from "../hooks/useCreateUser";
 
-export async function createUser(userData: User) {
+export async function createUser(userData: MockCreateUser) {
   try {
     const response = await fetch(`${URL_API}/posts`, {
       method: "POST",

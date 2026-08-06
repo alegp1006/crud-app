@@ -1,7 +1,7 @@
 import { URL_API } from "../constants/url";
-import type { User } from "../models/users";
+import type { MockUser } from "../hooks/useUpdateUser";
 
-export async function createUser(userData: User) {
+export async function upadteUserById(userData: MockUser) {
   try {
     const response = await fetch(`${URL_API}/posts/1`, {
       method: "PUT",

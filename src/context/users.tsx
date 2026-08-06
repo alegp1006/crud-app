@@ -4,6 +4,11 @@ import { type User } from "../models/users";
 import { useUser } from "../hooks/useUser";
 import { toast } from "sonner";
 
+interface UserState {
+  loading: boolean;
+  error: string | null;
+}
+
 export type UserAction =
   | { type: "SET_USERS"; payload: User[] }
   | { type: "DELETE_USER"; userID: string }
@@ -11,12 +16,13 @@ export type UserAction =
   | { type: "UPDATE_USER"; user: User };
 
 export const UsersContext = createContext<User[]>([]);
+export const UserStateContext = createContext<UserState | null>(null);
 export const UsersDispatchContext = createContext<React.ActionDispatch<
   [action: UserAction]
 > | null>(null);
 
 export const UsersProvider = ({ children }: { children: ReactNode }) => {
-  const { initialStateUser } = useUser();
+  const { loading, error, initialStateUser } = useUser();
   const [users, dispatch] = useReducer(userReducer, []);
 
   useEffect(() => {
@@ -28,7 +34,11 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UsersContext.Provider value={users}>
-      <UsersDispatchContext value={dispatch}>{children}</UsersDispatchContext>
+      <UserStateContext.Provider value={{ loading, error }}>
+        <UsersDispatchContext.Provider value={dispatch}>
+          {children}
+        </UsersDispatchContext.Provider>
+      </UserStateContext.Provider>
     </UsersContext.Provider>
   );
 };

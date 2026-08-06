@@ -1,20 +1,23 @@
-import { useState } from "react";
-import { toast } from "sonner";
 import { useUserDispatchContext } from "../hooks/useUserDispatchContext";
 import { useEditingUser } from "../hooks/useEditingUser";
+import { useUpadteUser } from "../hooks/useUpdateUser";
+import { useCreateUser } from "../hooks/useCreateUser";
 
 export function CreateNewUser() {
   const dispatch = useUserDispatchContext();
   const { userToEdit, setEditingUser } = useEditingUser();
-  const [result, setResult] = useState<"ok" | "error" | null>(null);
+  const {
+    error: createUserError,
+    loading: createUserLoading,
+    createUsers,
+  } = useCreateUser();
+  const { error, loading, updateUsers } = useUpadteUser();
 
   const isEditing = Boolean(userToEdit);
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     const id = crypto.randomUUID();
     e.preventDefault();
-
-    setResult(null);
 
     const form = e.target;
     const formData = new FormData(form);
@@ -23,34 +26,42 @@ export function CreateNewUser() {
     const gmail = formData.get("gmail") as string;
     const github = formData.get("github") as string;
 
-    if (!name || !gmail || !github) {
-      return setResult("error");
-    }
-
     if (isEditing && userToEdit) {
-      dispatch({
-        type: "UPDATE_USER",
-        user: {
-          userID: userToEdit.userID,
-          name,
-          gmail,
-          github,
-        },
+      updateUsers({
+        id: 1,
+        title: name,
+        body: gmail,
+        userId: 1,
       });
+      if (!error || error === null) {
+        dispatch({
+          type: "UPDATE_USER",
+          user: {
+            userID: userToEdit.userID,
+            name,
+            gmail,
+            github,
+          },
+        });
+      }
     } else {
-      dispatch({
-        type: "ADD_USER",
-        user: {
-          userID: id,
-          name: name,
-          gmail: gmail,
-          github: github,
-        },
+      createUsers({
+        userId: 1,
+        title: name,
+        body: gmail,
       });
+      if (!createUserError || createUserError === null) {
+        dispatch({
+          type: "ADD_USER",
+          user: {
+            userID: id,
+            name: name,
+            gmail: gmail,
+            github: github,
+          },
+        });
+      }
     }
-
-    setResult("ok");
-    toast("usuario creado :)");
 
     form.reset();
   };
@@ -87,27 +98,18 @@ export function CreateNewUser() {
           defaultValue={userToEdit?.github || ""}
         />
       </label>
-      <button type="submit">
+      <button disabled={loading || createUserLoading} type="submit">
         {isEditing ? "Guardar Cambios" : "Crear usuario"}
       </button>
 
       {isEditing && (
-        <button type="button" onClick={() => setEditingUser(null)}>
+        <button
+          disabled={loading || createUserLoading}
+          type="button"
+          onClick={() => setEditingUser(null)}>
           Cancelar Edición
         </button>
       )}
-      <span>
-        {result === "ok" && (
-          <p style={{ color: "green" }}>
-            {isEditing
-              ? "Usuario editado correctamente"
-              : "Usuario creado correctamente"}
-          </p>
-        )}
-        {result === "error" && (
-          <p style={{ color: "red" }}>Error al procesar usuario</p>
-        )}
-      </span>
     </form>
   );
 }
