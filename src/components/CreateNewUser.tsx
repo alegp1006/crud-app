@@ -2,26 +2,19 @@ import { useUserDispatchContext } from "../hooks/useUserDispatchContext";
 import { useEditingUser } from "../hooks/useEditingUser";
 import { useUpadteUser } from "../hooks/useUpdateUser";
 import { useCreateUser } from "../hooks/useCreateUser";
-import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-const userSchema = z.object({
-  name: z
-    .string()
-    .min(3, "el nombre debe contener minimo 3 caracteres")
-    .max(15, "el nombre debe tener como maximo 15 caracteres"),
-  gmail: z.email("el gmail es incorrecto"),
-  github: z
-    .string()
-    .min(3, "el nombre de usuario debe tener minimo 3 caracteres")
-    .max(20, " el nombre de usuario debe tener maximo 20 caracteres"),
-});
-
-type UserData = z.infer<typeof userSchema>;
+import { userSchema, type UserData } from "../models/schema";
 
 export function CreateNewUser() {
   const { userToEdit, setEditingUser } = useEditingUser();
+  const dispatch = useUserDispatchContext();
+  const {
+    error: createUserError,
+    loading: createUserLoading,
+    createUsers,
+  } = useCreateUser();
+  const { error, loading, updateUsers } = useUpadteUser();
   const {
     register,
     handleSubmit,
@@ -35,14 +28,6 @@ export function CreateNewUser() {
       github: userToEdit?.github || "",
     },
   });
-  const dispatch = useUserDispatchContext();
-
-  const {
-    error: createUserError,
-    loading: createUserLoading,
-    createUsers,
-  } = useCreateUser();
-  const { error, loading, updateUsers } = useUpadteUser();
 
   const isEditing = Boolean(userToEdit);
 
@@ -108,33 +93,21 @@ export function CreateNewUser() {
       }}>
       <label>
         Nombre
-        <input
-          //name="name"
-          type="text"
-          {...register("name")}
-        />
+        <input type="text" {...register("name")} />
         {errors?.name?.message && (
           <p style={{ color: "red" }}>{errors.name.message}</p>
         )}
       </label>
       <label>
         Gmail
-        <input
-          //name="gmail"
-          type="text"
-          {...register("gmail")}
-        />
+        <input type="text" {...register("gmail")} />
         {errors?.gmail?.message && (
           <p style={{ color: "red" }}>{errors.gmail.message}</p>
         )}
       </label>
       <label>
         Usuario de github
-        <input
-          //name="github"
-          type="text"
-          {...register("github")}
-        />
+        <input type="text" {...register("github")} />
         {errors?.github?.message && (
           <p style={{ color: "red" }}>{errors.github.message}</p>
         )}
