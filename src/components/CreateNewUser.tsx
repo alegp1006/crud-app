@@ -2,10 +2,41 @@ import { useUserDispatchContext } from "../hooks/useUserDispatchContext";
 import { useEditingUser } from "../hooks/useEditingUser";
 import { useUpadteUser } from "../hooks/useUpdateUser";
 import { useCreateUser } from "../hooks/useCreateUser";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const userSchema = z.object({
+  name: z
+    .string()
+    .min(3, "el nombre debe contener minimo 3 caracteres")
+    .max(15, "el nombre debe tener como maximo 15 caracteres"),
+  gmail: z.email("el gmail es incorrecto"),
+  github: z
+    .string()
+    .min(3, "el nombre de usuario debe tener minimo 3 caracteres")
+    .max(20, " el nombre de usuario debe tener maximo 20 caracteres"),
+});
+
+type UserData = z.infer<typeof userSchema>;
 
 export function CreateNewUser() {
-  const dispatch = useUserDispatchContext();
   const { userToEdit, setEditingUser } = useEditingUser();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<UserData>({
+    resolver: zodResolver(userSchema),
+    values: {
+      name: userToEdit?.name || "",
+      gmail: userToEdit?.gmail || "",
+      github: userToEdit?.github || "",
+    },
+  });
+  const dispatch = useUserDispatchContext();
+
   const {
     error: createUserError,
     loading: createUserLoading,
@@ -15,16 +46,11 @@ export function CreateNewUser() {
 
   const isEditing = Boolean(userToEdit);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmitCreateUser = (data: UserData) => {
     const id = crypto.randomUUID();
-    e.preventDefault();
-
-    const form = e.target;
-    const formData = new FormData(form);
-
-    const name = formData.get("name") as string;
-    const gmail = formData.get("gmail") as string;
-    const github = formData.get("github") as string;
+    const name = data.name;
+    const gmail = data.gmail;
+    const github = data.github;
 
     if (isEditing && userToEdit) {
       updateUsers({
@@ -33,7 +59,7 @@ export function CreateNewUser() {
         body: gmail,
         userId: 1,
       });
-      if (!error && error === null) {
+      if (!error || error === null) {
         dispatch({
           type: "UPDATE_USER",
           user: {
@@ -43,6 +69,7 @@ export function CreateNewUser() {
             github,
           },
         });
+        setEditingUser(null);
       }
     } else {
       createUsers({
@@ -50,8 +77,7 @@ export function CreateNewUser() {
         title: name,
         body: gmail,
       });
-      if (createUserError === null && createUserError !== "") {
-        console.log(createUserError);
+      if (createUserError === null || createUserError !== "") {
         dispatch({
           type: "ADD_USER",
           user: {
@@ -64,12 +90,13 @@ export function CreateNewUser() {
       }
     }
 
-    form.reset();
+    reset();
   };
+
   return (
     <form
       key={userToEdit?.userID ?? "new"}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(handleSubmitCreateUser)}
       style={{
         marginTop: "16px",
         width: "100%",
@@ -81,23 +108,36 @@ export function CreateNewUser() {
       }}>
       <label>
         Nombre
-        <input name="name" type="text" defaultValue={userToEdit?.name || ""} />
+        <input
+          //name="name"
+          type="text"
+          {...register("name")}
+        />
+        {errors?.name?.message && (
+          <p style={{ color: "red" }}>{errors.name.message}</p>
+        )}
       </label>
       <label>
         Gmail
         <input
-          name="gmail"
+          //name="gmail"
           type="text"
-          defaultValue={userToEdit?.gmail || ""}
+          {...register("gmail")}
         />
+        {errors?.gmail?.message && (
+          <p style={{ color: "red" }}>{errors.gmail.message}</p>
+        )}
       </label>
       <label>
         Usuario de github
         <input
-          name="github"
+          //name="github"
           type="text"
-          defaultValue={userToEdit?.github || ""}
+          {...register("github")}
         />
+        {errors?.github?.message && (
+          <p style={{ color: "red" }}>{errors.github.message}</p>
+        )}
       </label>
       <button disabled={loading || createUserLoading} type="submit">
         {isEditing ? "Guardar Cambios" : "Crear usuario"}
@@ -107,7 +147,7 @@ export function CreateNewUser() {
         <button
           disabled={loading || createUserLoading}
           type="button"
-          onClick={() => setEditingUser(null)}>
+          onClick={() => (setEditingUser(null), reset())}>
           Cancelar Edición
         </button>
       )}
