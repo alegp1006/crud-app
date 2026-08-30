@@ -4,10 +4,37 @@ import { toast } from "sonner";
 import { useFetch } from "./useFetch";
 import { useStateLocalStorage } from "./useStateLocalStorage";
 
+const DEFAULT_USERS = [
+  {
+    userID: "1",
+    name: "aasfdfaf",
+    gmail: "example@gmail.com",
+    github: "alegp",
+  },
+  {
+    userID: "2",
+    name: "pepe rodriguez",
+    gmail: "peperodriguez@gmail.com",
+    github: "pepe121",
+  },
+  {
+    userID: "3",
+    name: "jordi curz",
+    gmail: "jordicruze@gmail.com",
+    github: "jordiC",
+  },
+  {
+    userID: "4",
+    name: "martha Lulu",
+    gmail: "marthaLulu@gmail.com",
+    github: "lulumartha",
+  },
+];
+
 export const useUser = () => {
   const [initialStateUser, setInitialStateUser] = useStateLocalStorage<User[]>({
     key: "users-crud",
-    initialValue: [],
+    initialValue: DEFAULT_USERS,
   });
   const { loading, error } = useFetch({
     service: getUsers,
