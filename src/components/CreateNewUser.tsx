@@ -5,6 +5,7 @@ import { useCreateUser } from "../hooks/useCreateUser";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSchema, type UserData } from "../models/schema";
+import "../styles/user-form.css";
 
 export function CreateNewUser() {
   const { userToEdit, setEditingUser } = useEditingUser();
@@ -80,50 +81,56 @@ export function CreateNewUser() {
 
   return (
     <form
+      className="user-form"
       key={userToEdit?.userID ?? "new"}
-      onSubmit={handleSubmit(handleSubmitCreateUser)}
-      style={{
-        marginTop: "16px",
-        width: "100%",
-        maxWidth: "500px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-      <label>
-        Nombre
-        <input type="text" {...register("name")} />
-        {errors?.name?.message && (
-          <p style={{ color: "red" }}>{errors.name.message}</p>
-        )}
-      </label>
-      <label>
-        Gmail
-        <input type="text" {...register("gmail")} />
-        {errors?.gmail?.message && (
-          <p style={{ color: "red" }}>{errors.gmail.message}</p>
-        )}
-      </label>
-      <label>
-        Usuario de github
-        <input type="text" {...register("github")} />
-        {errors?.github?.message && (
-          <p style={{ color: "red" }}>{errors.github.message}</p>
-        )}
-      </label>
-      <button disabled={loading || createUserLoading} type="submit">
-        {isEditing ? "Guardar Cambios" : "Crear usuario"}
-      </button>
-
-      {isEditing && (
+      onSubmit={handleSubmit(handleSubmitCreateUser)}>
+      <fieldset className="user-form-fieldset">
+        <label className="user-form-label">
+          Nombre
+          <input
+            className="user-form-input"
+            type="text"
+            {...register("name")}
+          />
+          {errors?.name?.message && <p>{errors.name.message}</p>}
+        </label>
+        <label className="user-form-label">
+          Gmail
+          <input
+            className="user-form-input"
+            type="text"
+            {...register("gmail")}
+          />
+          {errors?.gmail?.message && <p>{errors.gmail.message}</p>}
+        </label>
+        <label className="user-form-label">
+          Usuario de github
+          <input
+            className="user-form-input"
+            type="text"
+            {...register("github")}
+          />
+          {errors?.github?.message && <p>{errors.github.message}</p>}
+        </label>
+      </fieldset>
+      <div className="user-form-buttons">
         <button
+          className="user-form-button"
           disabled={loading || createUserLoading}
-          type="button"
-          onClick={() => (setEditingUser(null), reset())}>
-          Cancelar Edición
+          type="submit">
+          {isEditing ? "Guardar Cambios" : "Crear usuario"}
         </button>
-      )}
+
+        {isEditing && (
+          <button
+            className="cancel-button"
+            disabled={loading || createUserLoading}
+            type="button"
+            onClick={() => (setEditingUser(null), reset())}>
+            Cancelar Edición
+          </button>
+        )}
+      </div>
     </form>
   );
 }
