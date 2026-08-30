@@ -3,6 +3,7 @@ import { getUsers } from "../services/getUsers";
 import { toast } from "sonner";
 import { useFetch } from "./useFetch";
 import { useStateLocalStorage } from "./useStateLocalStorage";
+import { useEffect } from "react";
 
 const DEFAULT_USERS = [
   {
@@ -36,11 +37,17 @@ export const useUser = () => {
     key: "users-crud",
     initialValue: DEFAULT_USERS,
   });
-  const { loading, error } = useFetch({
+  const { loading, error, fetchData } = useFetch({
     service: getUsers,
     state: initialStateUser,
     setState: setInitialStateUser,
   });
+
+  useEffect(() => {
+    if (initialStateUser.length === 0) {
+      fetchData();
+    }
+  }, []);
 
   if (error && !loading) {
     toast.error("error al cargar los usuarios");
