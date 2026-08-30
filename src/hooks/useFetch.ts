@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useState,
   type Dispatch,
   type SetStateAction,
@@ -12,12 +11,11 @@ export function useFetch<T>({
   setState,
 }: {
   service: () => Promise<T>;
-  state?: T;
+  state?: T | [];
   setState?: Dispatch<SetStateAction<T>>;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const controller = new AbortController();
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,14 +34,6 @@ export function useFetch<T>({
       setLoading(false);
     }
   }, [service]);
-
-  useEffect(() => {
-    fetchData();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   return {
     loading,
